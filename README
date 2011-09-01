@@ -1,0 +1,15 @@
+This is intended to be a collection of basic DSP algorithms
+Currently implemented are:
+-Convolution/Cross-correlation in quadratic (O(N^2)) time
+-FFT (non-recursive Cooley-Tuckey algorithm without extra storage)
+-some bit reversal routines for bytes and integers
+
+TODO:
+-FFT for real-only data
+-Convolution/Cross-correlation using fft in linearithmic (O(N*log(N)) time
+-some demodulation algorithm for sound frequency detection
+-demos:
+	polynomial multiplication
+	2d convolution for images (blur, edge detection)
+	audio effects (delay, shift etc)
+-documentation and comments
