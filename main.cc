@@ -37,11 +37,11 @@ static void test_fft_2d(void) {
 	for (int j = 0; j < 2; j++) {
 		for (int i = 0; i < 4; i++) {
 			//vertical direction
-			fft_real(arr + i, 4, 4, j & 1);
+			fft_skip(arr + i, 4, 4, j & 1);
 		}
 		for (int i = 0; i < 4; i++) {
 			//horizontal direction
-			fft_real(arr + 4 * i, 1, 4, j & 1);
+			fft_skip(arr + 4 * i, 1, 4, j & 1);
 		}
 	}
 	cout << "2d fft" << endl;

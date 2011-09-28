@@ -70,7 +70,7 @@ void fft(std::vector<std::complex<T>> &arr, bool inverse) {
 }
 
 template <class T>
-void fft_real(std::complex<T> data[], size_t stride, size_t count, bool inverse) {
+void fft_skip(std::complex<T> data[], size_t stride, size_t count, bool inverse) {
 	std::vector<std::complex<T>> vec(count, 0);
 	for (size_t i = 0; i < count; i++) {
 		vec[i] = data[stride * i];
