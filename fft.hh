@@ -81,4 +81,16 @@ void fft_skip(std::complex<T> data[], size_t stride, size_t count, bool inverse)
 	}
 }
 
+template<class T>
+void fft_2d(std::complex<T> *data, size_t width, size_t height, bool inverse) {
+	for (size_t i = 0; i < width; i++) {
+		//vertical direction
+		fft_skip(data + i, width, height, inverse);
+	}
+	for (size_t i = 0; i < height; i++) {
+		//horizontal direction
+		fft_skip(data + width * i, 1, width, inverse);
+	}
+}
+
 #endif
