@@ -1,6 +1,6 @@
 APPNAME=convolution
 CXX ?= g++
-CXFLAGS=-std=c++0x -Wall
+CXFLAGS=-std=c++0x -Wall -pg
 
 CXFILES = main.cc
 OBJFILES = $(patsubst %.cc,%.o,$(CXFILES))
