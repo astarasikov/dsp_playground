@@ -16,13 +16,14 @@ DspWidget::DspWidget(QWidget *parent)
 	Q_UNUSED(parent);
 
 	QFrame *controls = new QFrame(this);
+	controls->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 	QHBoxLayout *lay_controls = new QHBoxLayout(controls);
 
 	kernelTable = new QTableWidget(this);
 	kernelTable->setVerticalHeader(NULL);
 	kernelTable->setHorizontalHeader(NULL);
 	kernelTable->setGridStyle(Qt::DashDotLine);
-	kernelTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	kernelTable->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
 	QFrame *switches = new QFrame(this);
 	createControls(switches);
@@ -30,14 +31,14 @@ DspWidget::DspWidget(QWidget *parent)
 	lay_controls->addWidget(kernelTable);;
 
 	image = new QLabel(this);
-	image->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	image->setScaledContents(true);
 
 	result = new QLabel(this);
-	result->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	result->setScaledContents(true);
 
 	QFrame *images = new QFrame(this);
+	images->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+	
 	QHBoxLayout *hb_images = new QHBoxLayout(images);
 	hb_images->addWidget(image);
 	hb_images->addWidget(result);
