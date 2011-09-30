@@ -16,14 +16,16 @@ DspWidget::DspWidget(QWidget *parent)
 	Q_UNUSED(parent);
 
 	QFrame *controls = new QFrame(this);
-	controls->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+	controls->setSizePolicy(QSizePolicy::MinimumExpanding,	
+		QSizePolicy::Minimum);
 	QHBoxLayout *lay_controls = new QHBoxLayout(controls);
 
 	kernelTable = new QTableWidget(this);
 	kernelTable->setVerticalHeader(NULL);
 	kernelTable->setHorizontalHeader(NULL);
 	kernelTable->setGridStyle(Qt::DashDotLine);
-	kernelTable->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+	kernelTable->setSizePolicy(QSizePolicy::MinimumExpanding,
+		QSizePolicy::Minimum);
 
 	QFrame *switches = new QFrame(this);
 	createControls(switches);
