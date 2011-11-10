@@ -98,7 +98,7 @@ void DspWidget :: convolve(void) {
 	int dx = kern_w >> 1;
 	int dy = kern_h >> 1;
 
-	double sum = 0;
+	int sum = 0;
 
 	int *kernel = new int[kern_w * kern_h];
 	for (int i = 0; i < kern_h; i++) {
@@ -123,9 +123,9 @@ void DspWidget :: convolve(void) {
 	for (int i = 0; i < h; i++) {
 		//loop in vertical direction
 		for (int j = 0; j < w; j++) {
-			QRgb _red = 0;
-			QRgb _green = 0;
-			QRgb _blue = 0;
+			int _red = 0;
+			int _green = 0;
+			int _blue = 0;
 	
 			for (int k = 0; k < kern_h; k++) {
 				//flip kernel horizontally
@@ -162,9 +162,12 @@ void DspWidget :: convolve(void) {
 					_blue += blue * kernel[kern_idx];
 				}
 			}
-			_red = (QRgb)(_red / sum);
-			_green = (QRgb)(_green / sum);
-			_blue = (QRgb)(_blue / sum);
+			
+			if (sum) {
+				_red = (int)(_red / sum);
+				_green = (int)(_green / sum);
+				_blue = (int)(_blue / sum);
+			}
 
 			QRgb result = qRgb(_red, _green, _blue);
 			outputImage->setPixel(j, i, result);
