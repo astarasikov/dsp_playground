@@ -4,6 +4,7 @@
 #include "convolution.hh"
 #include "correlation.hh"
 #include "fft.hh"
+#include "windowfunction.hh"
 
 using namespace std;
 
@@ -63,11 +64,19 @@ static void test_correlation_1d(void) {
 	dump(cor);
 }
 
+static void test_window(void) {
+	double foo[] = {1, 2, 3, 4};
+	HannWindow<double> wnd(4);
+	wnd.apply(foo);
+	dump(foo);
+}
+
 int main() {
 	test_convolution_1d();
 	test_correlation_1d();
 	test_fft_1d();
 	test_fft_2d();
+	test_window();
 
 	return 0;
 }
