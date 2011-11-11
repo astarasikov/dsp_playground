@@ -8,23 +8,6 @@
 
 #include "bit_hacks.hh"
 
-template<class T>
-void bitreversal_permutation(std::vector<T> &vec) {
-	size_t j = 0;
-	size_t size = vec.size();
-	for (size_t i = 0; i < size - 1; i++) {
-		if (i < j) {
-			swap(vec[i], vec[j]);
-		}
-		size_t k = size >> 1;
-		while (k <= j) {
-			j -= k;
-			k >>= 1;
-		}
-		j += k;
-	}
-}
-
 template <class T>
 void fft(std::vector<std::complex<T>> &arr, bool inverse) {
 	size_t size = arr.size();

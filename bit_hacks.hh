@@ -2,6 +2,8 @@
 #define __BIT_HACKS_HH__
 
 #include <climits>
+#include <vector>
+
 template <class T>
 T next_power_of_two(T x) {
 	if (!x) {
@@ -31,6 +33,23 @@ T bit_reverse(T x) {
 	}
 
 	return ret;
+}
+
+template<class T>
+void bitreversal_permutation(std::vector<T> &vec) {
+	size_t j = 0;
+	size_t size = vec.size();
+	for (size_t i = 0; i < size - 1; i++) {
+		if (i < j) {
+			swap(vec[i], vec[j]);
+		}
+		size_t k = size >> 1;
+		while (k <= j) {
+			j -= k;
+			k >>= 1;
+		}
+		j += k;
+	}
 }
 
 #endif
