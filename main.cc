@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <complex>
+#include <algorithm>
 #include "convolution.hh"
 #include "correlation.hh"
 #include "fft.hh"
@@ -64,6 +65,43 @@ static void test_correlation_1d(void) {
 	dump(cor);
 }
 
+static void test_lowpass(void) {
+	vector<complex<double>> sig =
+		{100, 200, 300, 400, 500, 600, 700, 800};
+	fft(sig, true);
+
+	double fcut = 300;
+	double RC = 1 / (2 * M_PI * fcut);
+	double dt = 1.0 / 8000;
+	double a = dt / (dt + RC);
+	for (size_t i = 1; i < sig.size(); i++) {
+		sig[i] = a * sig[i] + (1 - a) * sig[i - 1];
+	}
+	fft(sig, false);
+	cout << "after filtering" << endl;
+	dump(sig);
+}
+
+static void test_hipass(void) {
+	vector<complex<double>> sig =
+		{100, 200, 300, 400, 500, 600, 700, 800};
+	fft(sig, true);
+
+	double fcut = 300;
+	double RC = 1 / (2 * M_PI * fcut);
+	double dt = 1.0 / 8000;
+	double a = dt / (dt + RC);
+	vector<complex<double>> ret;
+	copy(begin(sig), end(sig), back_inserter(ret));
+	ret[0] = 0;
+	for (size_t i = 1; i < sig.size(); i++) {
+		ret[i] = a * ret[i - 1] + a * (sig[i] - sig[i -1]);
+	}
+	fft(ret, false);
+	cout << "after filtering" << endl;
+	dump(ret);
+}
+
 static void test_window(void) {
 	double foo[] = {1, 2, 3, 4};
 	HannWindow<double> wnd(4);
@@ -76,6 +114,8 @@ int main() {
 	test_correlation_1d();
 	test_fft_1d();
 	test_fft_2d();
+	test_lowpass();
+	test_hipass();
 	test_window();
 
 	return 0;
