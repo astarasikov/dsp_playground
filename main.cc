@@ -9,6 +9,8 @@
 
 using namespace std;
 
+#define NUM_TEST_SAMPLES 8
+
 template <class T>
 static void dump(const T& x) {
 	cout << "[";
@@ -19,11 +21,11 @@ static void dump(const T& x) {
 }
 
 static void test_fft_1d(void) {
-	vector<complex<double>> ff2 = {0, 1, 2, 3, 4, 5, 6, 7};
-	fft(ff2, false);
+	complex<double> ff2[NUM_TEST_SAMPLES] = {0, 1, 2, 3, 4, 5, 6, 7};
+	fft(ff2, NUM_TEST_SAMPLES, false);
 	cout << "after FFT" << endl;
 	dump(ff2);
-	fft(ff2, true);
+	fft(ff2, NUM_TEST_SAMPLES, true);
 	cout << "after IFFT" << endl;
 	dump(ff2);
 }
@@ -66,38 +68,37 @@ static void test_correlation_1d(void) {
 }
 
 static void test_lowpass(void) {
-	vector<complex<double>> sig =
+	complex<double> sig[NUM_TEST_SAMPLES] =
 		{100, 200, 300, 400, 500, 600, 700, 800};
-	fft(sig, true);
+	fft(sig, NUM_TEST_SAMPLES, true);
 
 	double fcut = 300;
 	double RC = 1 / (2 * M_PI * fcut);
 	double dt = 1.0 / 8000;
 	double a = dt / (dt + RC);
-	for (size_t i = 1; i < sig.size(); i++) {
+	for (size_t i = 1; i < NUM_TEST_SAMPLES; i++) {
 		sig[i] = a * sig[i] + (1 - a) * sig[i - 1];
 	}
-	fft(sig, false);
+	fft(sig, NUM_TEST_SAMPLES, false);
 	cout << "after filtering" << endl;
 	dump(sig);
 }
 
 static void test_hipass(void) {
-	vector<complex<double>> sig =
+	complex<double> sig[NUM_TEST_SAMPLES] =
 		{100, 200, 300, 400, 500, 600, 700, 800};
-	fft(sig, true);
+	fft(sig, NUM_TEST_SAMPLES, true);
 
 	double fcut = 300;
 	double RC = 1 / (2 * M_PI * fcut);
 	double dt = 1.0 / 8000;
 	double a = dt / (dt + RC);
-	vector<complex<double>> ret;
-	copy(begin(sig), end(sig), back_inserter(ret));
+	complex<double> ret[NUM_TEST_SAMPLES];
 	ret[0] = 0;
-	for (size_t i = 1; i < sig.size(); i++) {
+	for (size_t i = 1; i < NUM_TEST_SAMPLES; i++) {
 		ret[i] = a * ret[i - 1] + a * (sig[i] - sig[i -1]);
 	}
-	fft(ret, false);
+	fft(ret, NUM_TEST_SAMPLES, false);
 	cout << "after filtering" << endl;
 	dump(ret);
 }

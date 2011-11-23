@@ -9,8 +9,7 @@
 #include "bit_hacks.hh"
 
 template <class T>
-void fft(std::vector<std::complex<T>> &arr, bool inverse) {
-	size_t size = arr.size();
+void fft(std::complex<T> *arr, size_t size, bool inverse) {
 	size_t pwr = next_power_of_two(size);
 
 	if (size <= 1) {
@@ -22,7 +21,7 @@ void fft(std::vector<std::complex<T>> &arr, bool inverse) {
 		return;
 	}
 
-	bitreversal_permutation(arr);
+	bitreversal_permutation(arr, size);
 	
 	for (size_t step_size = 2; step_size <= size; step_size <<= 1) {
 		std::complex<T> w(1, 0);
@@ -54,14 +53,17 @@ void fft(std::vector<std::complex<T>> &arr, bool inverse) {
 
 template <class T>
 void fft_skip(std::complex<T> data[], size_t stride, size_t count, bool inverse) {
-	std::vector<std::complex<T>> vec(count, 0);
+	auto vec = new std::complex<T>[count];
+
 	for (size_t i = 0; i < count; i++) {
 		vec[i] = data[stride * i];
 	}
-	fft(vec, inverse);
+	fft(vec, count, inverse);
 	for (size_t i = 0; i < count; i++) {
 		data[stride * i] = vec[i];
 	}
+
+	delete[] vec;
 }
 
 template<class T>
