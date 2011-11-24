@@ -9,7 +9,11 @@
 #include <QPushButton>
 #include <QTableWidgetItem>
 
+#include <complex>
+
 #include "qimageconv.h"
+
+#include "../fft.hh"
 
 DspWidget::DspWidget(QWidget *parent)
 	: inputImage(NULL), outputImage(NULL) {
@@ -80,6 +84,121 @@ void DspWidget :: createControls(QWidget *frame) {
 	QPushButton *bn_convolve = new QPushButton(tr("Convolve"));
 	connect(bn_convolve, SIGNAL(clicked()), this, SLOT(convolve()));
 	lay_controls->addWidget(bn_convolve, 4, 0);
+
+	QPushButton *bn_convolveFFT = new QPushButton(tr("Convolve FFT"));
+	connect(bn_convolveFFT, SIGNAL(clicked()), this, SLOT(convolveFFT()));
+	lay_controls->addWidget(bn_convolveFFT, 5, 0);
+}
+
+void DspWidget :: convolveFFT(void) {
+	if (!inputImage) {
+		return;
+	}
+
+	if (!outputImage) {
+		return;
+
+	}
+
+	//image dimensions
+	int w = outputImage->width();
+	int h = outputImage->height();
+	int dim = next_power_of_two(w > h ? w : h);
+
+	int chan_size = dim * dim;
+	
+	//kernel dimensions
+	int user_kern_w = kernelTable->columnCount();
+	int user_kern_h = kernelTable->rowCount();
+	
+	int kern_w = dim;
+	int kern_h = dim;
+
+	auto kernel = new std::complex<double>[kern_w * kern_h];
+	Q_ASSERT(kernel != NULL);
+
+	auto image = new std::complex<long double>[chan_size * 3];
+	Q_ASSERT(image != NULL);
+
+	double sum = 0;
+
+	for (int i = 0; i < kern_h; i++) {
+		for (int j = 0; j < kern_w; j++) {
+			int idx = i * kern_w + j;
+
+			kernel[idx] = 0;
+
+			if (i >= user_kern_h || j >= user_kern_w) {
+				continue;
+			}
+	
+			QTableWidgetItem *item = kernelTable->itemAt(i, j);
+			if (item) {
+				QString str = kernelTable->item(i, j)->text();
+				if (str.length() > 0) {
+					kernel[idx] = str.toInt();
+					sum += kernel[idx].real();
+				}
+			}
+		}
+	}
+
+	for (int i = 0; i < user_kern_w; i++) {
+		int ki = i * kern_w;
+		for (int j = 0; j < user_kern_h; j++) {
+			kernel[ki + j] /= sum;
+		}
+	}
+	fft_2d(kernel, kern_w, kern_h, false);
+
+	for (int i = 0; i < h; i++) {
+		int r_idx = dim * i;
+		int g_idx = chan_size + r_idx;
+		int b_idx = 2 * chan_size + r_idx;
+		
+		for (int j = 0; j < w; j++) {
+			QRgb pix = outputImage->pixel(j, i);
+			image[r_idx + j] = qRed(pix);
+			image[g_idx + j] = qGreen(pix);
+			image[b_idx + j] = qBlue(pix);
+		}
+	}
+	
+	fft_2d(image, dim, dim, false);
+	fft_2d(image + chan_size, dim, dim, false);
+	fft_2d(image + 2 * chan_size, dim, dim, false);
+
+	for (int i = 0; i < dim; i++) {
+		int r_pad = dim * i;
+		int g_pad = chan_size + r_pad;
+		int b_pad = 2 * chan_size + r_pad;
+		for (int j = 0; j < dim; j++) {
+			image[r_pad + j] *= kernel[r_pad + j];
+			image[g_pad + j] *= kernel[r_pad + j];
+			image[b_pad + j] *= kernel[r_pad + j];
+		}
+	}
+
+	//FIXME: perform convolution
+	fft_2d(image, dim, dim, true);
+	fft_2d(image + chan_size, dim, dim, true);
+	fft_2d(image + 2 * chan_size, dim, dim, true);
+
+	for (int i = 0; i < h; i++) {
+		int r_idx = dim * i;
+		int g_idx = chan_size + r_idx;
+		int b_idx = 2 * chan_size + r_idx;
+		
+		for (int j = 0; j < w; j++) {
+			int r = (int)real(image[r_idx + j]);
+			int g = (int)real(image[g_idx + j]);
+			int b = (int)real(image[b_idx + j]);
+			outputImage->setPixel(j, i, qRgb(r, g, b));
+		}
+	}
+	
+	delete[] kernel;
+	refreshImages();
 }
 
 void DspWidget :: convolve(void) {

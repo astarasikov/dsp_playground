@@ -35,6 +35,7 @@ protected slots:
 	void resetKernel(void);
 	void resetImage(void);
 	void convolve(void);
+	void convolveFFT(void);
 	void refreshImages(void);
 	void fillKernel(void);
 };

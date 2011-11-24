@@ -7,6 +7,8 @@ TARGET =
 DEPENDPATH += .
 INCLUDEPATH += .
 
+QMAKE_CXXFLAGS += -std=c++0x
+
 # Input
 HEADERS += qimageconv.h
 SOURCES += qimageconv.cpp
