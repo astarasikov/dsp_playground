@@ -110,6 +110,65 @@ static void test_window(void) {
 	dump(foo);
 }
 
+static void overlap_add(complex<double> *sig, size_t sig_size,
+	complex<double> *flt, size_t flt_size, complex<double> *out) {
+	size_t y_idx = 0;
+
+	size_t L = 1;
+	size_t M = next_power_of_two(flt_size);
+	size_t N = next_power_of_two(L + M - 1);
+	size_t out_size = sig_size + M - 1;
+
+	auto buf = new complex<double>[N];
+	auto h = new complex<double>[M];
+
+	fill_n(out, out_size, 0);
+	fill_n(h, M, 0);
+	for (size_t i = 0; i < flt_size; i++) {
+		h[i] = flt[i];
+	}
+	fft(h, M, false);
+
+	for (size_t x_idx = 0; x_idx < sig_size; x_idx += L) {
+		//pad with zeroes
+		fill_n(buf, N, 0);
+		for (size_t i = 0; i < L; i++) {
+			buf[i] = sig[x_idx + i];
+		}
+		fft(buf, N, false);
+		
+		for (size_t i = 0; i < M; i++) {
+			buf[i] *= h[i];
+		}
+		fft(buf, N, true);
+
+		size_t ymax = min(N, out_size - y_idx);
+		for (size_t i = 0; i < ymax; i++) {
+			out[i + y_idx] += buf[i];
+		}
+
+		y_idx += L;
+	}
+	
+	delete[] h;
+	delete[] buf;
+}
+
+static void test_ola(void) {
+	complex<double> sig[NUM_TEST_SAMPLES]= {100, 100, 100, 200, 300, 400, 500, 600};
+	static const size_t FLT_SIZE = 7;
+	static const size_t OUT_SIZE = NUM_TEST_SAMPLES + FLT_SIZE - 1;
+	complex<double> flt[FLT_SIZE] = {0, 1, 0, 0, 0, 0, 0};
+	complex<double> out[OUT_SIZE];
+	overlap_add(sig, NUM_TEST_SAMPLES, flt, FLT_SIZE, out);
+	
+	cout << "[";
+	for (size_t i = 0; i < OUT_SIZE; i++) {
+		cout << out[i].real() << " ";
+	}
+	cout << "]" << endl;
+};
+
 int main() {
 	test_convolution_1d();
 	test_correlation_1d();
@@ -118,6 +177,7 @@ int main() {
 	test_lowpass();
 	test_hipass();
 	test_window();
+	test_ola();
 
 	return 0;
 }
