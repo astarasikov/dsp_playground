@@ -16,6 +16,7 @@
 
 #include "qimageconv.h"
 #include "convolution2d.h"
+#include "TimeLog.h"
 
 #include "../fft.hh"
 
@@ -218,7 +219,11 @@ void DspWidget :: convolve(void) {
     QImageArrayAdaptor adaptor(*outputImage);
     DirectConvolution2D<int, QImageArrayAdaptor>
             convolution(kernel, adaptor);
+
+    QString title("2D Convolution");
+    DebugTimeLog log(title);
     convolution.convolve();
+    log.stop();
 
     refreshImages();
 }
