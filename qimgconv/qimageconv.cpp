@@ -214,74 +214,11 @@ void DspWidget :: convolve(void) {
         return;
     }
 
-    int kern_w = kernelTable->columnCount();
-    int kern_h = kernelTable->rowCount();
-
-    //origin offset
-    int dx = kern_w >> 1;
-    int dy = kern_h >> 1;
-
     Kernel<int> kernel(*(this->kernelTable));
-    int sum = kernel.sum();
-
-    uchar *bits = outputImage->bits();
-
-    int w = outputImage->width();
-    int h = outputImage->height();
-
-    for (int i = 0; i < h; i++) {
-        //loop in vertical direction
-        for (int j = 0; j < w; j++) {
-            int _red = 0;
-            int _green = 0;
-            int _blue = 0;
-
-            for (int k = 0; k < kern_h; k++) {
-                //flip kernel horizontally
-                int kern_i = kern_h - k - 1;
-
-                //shift to origin
-                int _k = i + kern_i - dy;
-
-                //boundary check
-                if (_k < 0 || _k >= h) {
-                    continue;
-                }
-
-                for (int m = 0; m < kern_w; m++) {
-                    //flip kernel vertically
-                    int kern_j = kern_w - m - 1;
-
-                    //shift to origin
-                    int _m = j + kern_j - dx;
-
-                    if (_m < 0 || _m >= w) {
-                        continue;
-                    }
-
-                    int kern_idx = kern_i * kern_w + kern_j;
-
-                    QRgb sig = outputImage->pixel(_m, _k);
-                    QRgb red = qRed(sig);
-                    QRgb green = qGreen(sig);
-                    QRgb blue = qBlue(sig);
-
-                    _red += red * kernel[kern_idx];
-                    _green += green * kernel[kern_idx];
-                    _blue += blue * kernel[kern_idx];
-                }
-            }
-
-            if (sum) {
-                _red = (int)(_red / sum);
-                _green = (int)(_green / sum);
-                _blue = (int)(_blue / sum);
-            }
-
-            QRgb result = qRgb(_red, _green, _blue);
-            outputImage->setPixel(j, i, result);
-        }
-    }
+    QImageArrayAdaptor adaptor(*outputImage);
+    DirectConvolution2D<int, QImageArrayAdaptor>
+            convolution(kernel, adaptor);
+    convolution.convolve();
 
     refreshImages();
 }

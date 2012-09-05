@@ -76,4 +76,150 @@ public:
         return mData[idx];
     }
 };
+
+class QImageArrayAdaptor {
+protected:
+    QImage &mImage;
+
+public:
+    class ItemType {
+        friend class QImageArrayAdaptor;
+    protected:
+        QRgb mRed;
+        QRgb mGreen;
+        QRgb mBlue;
+    public:
+        inline ItemType() : mRed(0), mGreen(0), mBlue(0) {}
+        inline ItemType(QRgb red, QRgb green, QRgb blue):
+            mRed(red), mGreen(green), mBlue(blue) {}
+
+        inline ItemType operator+(ItemType other) {
+            return ItemType(
+                mRed + other.mRed,
+                mGreen + other.mGreen,
+                mBlue + other.mBlue
+            );
+        }
+
+        template <typename T>
+        inline ItemType operator/(T other) {
+            return ItemType(
+                reinterpret_cast<QRgb>(mRed / other),
+                reinterpret_cast<QRgb>(mGreen / other),
+                reinterpret_cast<QRgb>(mBlue / other)
+            );
+        }
+
+        template <typename T>
+        inline ItemType operator*(T other) {
+            return ItemType(
+                reinterpret_cast<QRgb>(mRed * other),
+                reinterpret_cast<QRgb>(mGreen * other),
+                reinterpret_cast<QRgb>(mBlue * other)
+            );
+        }
+
+        inline ItemType operator=(ItemType other) {
+            mRed = other.mRed;
+            mGreen = other.mGreen;
+            mBlue = other.mBlue;
+            return *this;
+        }
+    };
+
+    QImageArrayAdaptor(QImage &image) : mImage(image) {}
+
+    inline size_t height() const {
+        return mImage.height();
+    }
+
+    inline size_t width() const {
+        return mImage.width();
+    }
+
+    inline ItemType get(size_t rowIndex, size_t columnIndex) {
+        QRgb rgb = mImage.pixel(columnIndex, rowIndex);
+        return ItemType(qRed(rgb), qGreen(rgb), qBlue(rgb));
+    }
+
+    inline void set(size_t rowIndex, size_t columnIndex, ItemType value) {
+        QRgb rgb = qRgb(value.mRed, value.mGreen, value.mBlue);
+        mImage.setPixel(columnIndex, rowIndex, rgb);
+    }
+};
+
+class Convolution2D
+{
+public:
+    virtual ~Convolution2D() {}
+    virtual void convolve() = 0;
+};
+
+template <typename T, typename Adaptor>
+class DirectConvolution2D : public Convolution2D {
+protected:
+    Kernel<T> &mKernel;
+    Adaptor &mArrayAdaptor;
+
+public:
+    DirectConvolution2D(Kernel<T> &kernel, Adaptor &adaptor) :
+        mKernel(kernel),
+        mArrayAdaptor(adaptor) {}
+
+    void convolve() {
+        size_t kern_height = mKernel.height();
+        size_t kern_width = mKernel.width();
+
+        size_t kern_row_off = kern_height >> 1;
+        size_t kern_col_off = kern_width >> 1;
+
+        size_t height = mArrayAdaptor.height();
+        size_t width = mArrayAdaptor.width();
+
+        T sum = mKernel.sum();
+
+        for (size_t img_row = 0; img_row < height; img_row++) {
+            for (size_t img_col = 0; img_col < width; img_col++) {
+                typename Adaptor::ItemType accumulator;
+
+                for (size_t kern_row = 0; kern_row < kern_height; kern_row++)
+                {
+                    int kern_row_idx = kern_height - kern_row - 1;
+                    int img_row_idx = img_row + kern_row_idx - kern_row_off;
+
+                    //linear convolution : do not wrap around the border
+                    if (img_row_idx < 0 || (size_t)img_row_idx >= height) {
+                        continue;
+                    }
+
+                    for (size_t kern_col = 0; kern_col < kern_width; kern_col++)
+                    {
+                        int kern_col_idx = kern_width - kern_col - 1;
+                        int img_col_idx = img_col + kern_col_idx - kern_col_off;
+
+                        if (img_col_idx < 0 || (size_t)img_col_idx >= width) {
+                            continue;
+                        }
+
+                        size_t kern_idx =
+                                kern_row_idx * kern_width + kern_col_idx;
+                        typename Adaptor::ItemType current =
+                                mArrayAdaptor.get(img_row_idx, img_col_idx);
+
+                        typename Adaptor::ItemType current_mult =
+                                current * mKernel[kern_idx];
+
+                        accumulator = accumulator + current_mult;
+                    }
+                }
+
+                if (sum != 0) {
+                    accumulator = accumulator / sum;
+                }
+                mArrayAdaptor.set(img_row, img_col, accumulator);
+            }
+        }
+    }
+};
+
 #endif // CONVOLUTION2D_H
