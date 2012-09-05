@@ -10,5 +10,6 @@ INCLUDEPATH += .
 QMAKE_CXXFLAGS += -std=c++0x
 
 # Input
-HEADERS += qimageconv.h
+HEADERS += qimageconv.h \
+    convolution2d.h
 SOURCES += qimageconv.cpp
