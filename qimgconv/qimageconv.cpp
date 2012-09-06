@@ -12,15 +12,14 @@
 #include <QDateTime>
 #include <QDebug>
 
-#include <complex>
-
+#include "../convolution2d.h"
 #include "qimageconv.h"
-#include "convolution2d.h"
 #include "QImageArrayAdaptor.h"
 #include "QTableWidgetKernelHelper.h"
 
 #include "TimeLog.h"
 
+#include <complex>
 #include "../fft.hh"
 
 DspWidget::DspWidget(QWidget *parent)

@@ -1,7 +1,5 @@
-#ifndef CONVOLUTION2D_H
-#define CONVOLUTION2D_H
-
-#include <QTableWidget>
+#ifndef CONVOLUTION2D_HH
+#define CONVOLUTION2D_HH
 
 /*
  * Note that most classes are implemented directly in this header
@@ -139,4 +137,4 @@ public:
     }
 };
 
-#endif // CONVOLUTION2D_H
+#endif // CONVOLUTION2D_HH
