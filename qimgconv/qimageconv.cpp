@@ -12,7 +12,7 @@
 #include <QDateTime>
 #include <QDebug>
 
-#include "../convolution2d.h"
+#include "../convolution2d.hh"
 #include "qimageconv.h"
 #include "QImageArrayAdaptor.h"
 #include "QTableWidgetKernelHelper.h"

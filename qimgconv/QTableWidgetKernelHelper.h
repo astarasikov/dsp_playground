@@ -2,7 +2,7 @@
 #define QTABLEWIDGETKERNELHELPER_H
 
 #include <QTableWidget>
-#include "convolution2d.h"
+#include "../convolution2d.hh"
 
 Kernel<int> kernelFromQTableWidget(const QTableWidget &table) {
     size_t width = table.columnCount();
