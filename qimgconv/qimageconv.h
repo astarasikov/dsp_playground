@@ -14,42 +14,45 @@
 #include <QSlider>
 
 class DspWidget : public QWidget {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	DspWidget(QWidget *parent = 0);
-	void loadImage(QString filename);
+    DspWidget(QWidget *parent = 0);
+    void loadImage(QString filename);
 protected:
-	static const int defaultKernelSize = 3;
-	static const int maxKernelSize = 21;
-	QLabel *image;
-	QLabel *result;
-	QSlider *slider_h;
-	QSlider *slider_w;
-	QTableWidget *kernelTable;
-	void createControls(QWidget *);
-	QImage *inputImage;
-	QImage *outputImage;
+    static const int defaultKernelSize = 3;
+    static const int maxKernelSize = 21;
+    QSlider *slider_h;
+    QSlider *slider_w;
+    QTableWidget *kernelTable;
+    void createControls(QWidget *);
+
+    QLabel *inputImageDisplay;
+    QLabel *outputImageDisplay;
+    QImage *inputImage;
+    QImage *outputImage;
+    uchar *outputBuffer;
 protected slots:
-	void setKernelWidth(int);
-	void setKernelHeight(int);
-	void resetKernel(void);
-	void resetImage(void);
-	void convolve(void);
-	void convolveFFT(void);
-	void refreshImages(void);
-	void fillKernel(void);
+    void setKernelWidth(int);
+    void setKernelHeight(int);
+    void resetKernel(void);
+    void resetOutputImage(void);
+    void replaceOutputImage(QImage *img);
+    void convolve(void);
+    void convolveFFT(void);
+    void refreshImages(void);
+    void fillKernel(void);
 };
 
 class DspWindow : public QMainWindow {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	DspWindow(QWidget *parent = 0);
+    DspWindow(QWidget *parent = 0);
 protected:
-	DspWidget *dsp;
-	
-	void buildMenu(void);
+    DspWidget *dsp;
+
+    void buildMenu(void);
 protected slots:
-	void openFile(void);
+    void openFile(void);
 };
 
 #endif // __QIMAGECONV_H__

@@ -43,18 +43,18 @@ DspWidget::DspWidget(QWidget *parent)
     lay_controls->addWidget(switches);
     lay_controls->addWidget(kernelTable);;
 
-    image = new QLabel(this);
-    image->setScaledContents(true);
+    inputImageDisplay = new QLabel(this);
+    inputImageDisplay->setScaledContents(true);
 
-    result = new QLabel(this);
-    result->setScaledContents(true);
+    outputImageDisplay = new QLabel(this);
+    outputImageDisplay->setScaledContents(true);
 
     QFrame *images = new QFrame(this);
     images->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
     QHBoxLayout *hb_images = new QHBoxLayout(images);
-    hb_images->addWidget(image);
-    hb_images->addWidget(result);
+    hb_images->addWidget(inputImageDisplay);
+    hb_images->addWidget(outputImageDisplay);
 
     QVBoxLayout *vb_ui = new QVBoxLayout(this);
     vb_ui->addWidget(controls);
@@ -85,7 +85,7 @@ void DspWidget :: createControls(QWidget *frame) {
     lay_controls->addWidget(bn_reset_kern, 2, 0);
 
     QPushButton *bn_reset_img = new QPushButton(tr("Reset Image"));
-    connect(bn_reset_img, SIGNAL(clicked()), this, SLOT(resetImage()));
+    connect(bn_reset_img, SIGNAL(clicked()), this, SLOT(resetOutputImage()));
     lay_controls->addWidget(bn_reset_img, 3, 0);
 
     QPushButton *bn_convolve = new QPushButton(tr("Convolve"));
@@ -209,18 +209,12 @@ void DspWidget :: convolveFFT(void) {
 }
 
 void DspWidget :: convolve(void) {
-    if (!inputImage) {
-        return;
-    }
-
     if (!outputImage) {
         return;
     }
 
-    uchar *out = new uchar[outputImage->byteCount()];
-
     Kernel<int> kernel = kernelFromQTableWidget(*(this->kernelTable));
-    QImageRawArrayAdaptor adaptor(*outputImage, out);
+    QImageRawArrayAdaptor adaptor(*outputImage, outputBuffer);
     DirectConvolution2D<int, QImageRawArrayAdaptor>
             convolution(kernel, adaptor);
 
@@ -230,14 +224,12 @@ void DspWidget :: convolve(void) {
     log.stop();
 
     QImage *newImage = new QImage(
-        out,
+        outputBuffer,
         outputImage->width(),
         outputImage->height(),
         outputImage->format());
 
-    delete outputImage;
-    outputImage = newImage;
-
+    replaceOutputImage(newImage);
     refreshImages();
 }
 
@@ -259,15 +251,39 @@ void DspWidget :: resetKernel(void) {
     fillKernel();
 }
 
-void DspWidget :: resetImage(void) {
+void DspWidget :: replaceOutputImage(QImage *img) {
     if (outputImage) {
         delete outputImage;
         outputImage = NULL;
     }
-    if (inputImage) {
-        outputImage = new QImage(*inputImage);
-        refreshImages();
+
+    outputImage = img;
+}
+
+void DspWidget :: resetOutputImage(void) {
+    if (!inputImage) {
+        return;
     }
+
+    if (outputBuffer) {
+        delete[] outputBuffer;
+        outputBuffer = NULL;
+    }
+
+    QImage *newImage = new QImage(*inputImage);
+    replaceOutputImage(newImage);
+    outputBuffer = new uchar[outputImage->byteCount()];
+    refreshImages();
+}
+
+void DspWidget :: loadImage(QString filename) {
+    if (inputImage) {
+        delete inputImage;
+        inputImage = NULL;
+    }
+    QImage img(filename);
+    inputImage = new QImage(img.convertToFormat(QImage::Format_RGB888));
+    resetOutputImage();
 }
 
 void DspWidget :: setKernelWidth(int columns) {
@@ -283,24 +299,11 @@ void DspWidget :: setKernelHeight(int rows) {
 void DspWidget :: refreshImages(void) {
     QPixmap in_pm;
     in_pm.convertFromImage(*inputImage);
-    image->setPixmap(in_pm);
+    inputImageDisplay->setPixmap(in_pm);
 
     QPixmap out_pm;
     out_pm.convertFromImage(*outputImage);
-    result->setPixmap(out_pm);
-}
-
-void DspWidget :: loadImage(QString filename) {
-    if (inputImage) {
-        delete inputImage;
-    }
-    if (outputImage) {
-        delete outputImage;
-    }
-    QImage img(filename);
-    inputImage = new QImage(img.convertToFormat(QImage::Format_RGB888));
-    outputImage = new QImage(*inputImage);
-    refreshImages();
+    outputImageDisplay->setPixmap(out_pm);
 }
 
 DspWindow :: DspWindow(QWidget *parent) {
