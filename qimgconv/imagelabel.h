@@ -36,6 +36,15 @@ public:
         __resize(size());
     }
 
+    void setImage(const QImage *image) {
+        mLastPixmap.convertFromImage(*image);
+        __resize(size());
+    }
+
+    void setImage(const QImage &image) {
+        setImage(&image);
+    }
+
 public slots:
     virtual void resize(const QSize &size) {
         __resize(this->size());

@@ -273,15 +273,9 @@ void DspWidget :: resetOutputImage(void) {
     refreshImages();
 }
 
-static void setLabelImage(QImage *image, ImageLabel *label) {
-    QPixmap in_pm;
-    in_pm.convertFromImage(*image);
-    label->setPixmap(in_pm);
-}
-
 void DspWidget :: refreshImages(void) {
-    setLabelImage(inputImage, inputImageDisplay);
-    setLabelImage(outputImage, outputImageDisplay);
+    inputImageDisplay->setImage(inputImage);
+    outputImageDisplay->setImage(outputImage);
 }
 
 void DspWidget :: loadImage(QString filename) {
