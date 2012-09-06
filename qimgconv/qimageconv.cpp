@@ -23,7 +23,7 @@
 #include "../fft.hh"
 
 DspWidget::DspWidget(QWidget *parent)
-    : inputImage(NULL), outputImage(NULL) {
+    : inputImage(NULL), outputImage(NULL), outputBuffer(NULL) {
     Q_UNUSED(parent);
 
     QFrame *controls = new QFrame(this);
@@ -298,10 +298,9 @@ void DspWidget :: setKernelHeight(int rows) {
     fillKernel();
 }
 
-DspWindow :: DspWindow(QWidget *parent) {
+DspWindow :: DspWindow(QWidget *parent) : dsp(new DspWidget()) {
     Q_UNUSED(parent);
 
-    dsp = new DspWidget();
     buildMenu();
     setCentralWidget(dsp);
 
