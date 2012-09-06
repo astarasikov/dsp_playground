@@ -1,7 +1,6 @@
 #ifndef CONVOLUTION2D_H
 #define CONVOLUTION2D_H
 
-#include <QImage>
 #include <QTableWidget>
 
 /*
@@ -27,32 +26,7 @@ public:
         mData(new T[width * height]),
         mWidth(width), mHeight(height), mSum(0)
     {
-        updateSum();
-    }
-
-    Kernel(QTableWidget &table) :
-        mData(new int[table.columnCount() * table.rowCount()]),
-        mWidth(table.columnCount()),
-        mHeight(table.rowCount()),
-        mSum(0)
-    {
-        for (size_t row = 0; row < mHeight; row++) {
-            size_t row_offset = row * mWidth;
-
-            for (size_t col = 0; col < mWidth; col++) {
-                int val = 0;
-
-                QTableWidgetItem *item = table.item(row, col);
-                if (item) {
-                    QString str = item->text();
-                    if (str.length()) {
-                        val = str.toInt();
-                    }
-                }
-
-                mData[row_offset + col] = val;
-            }
-        }
+        std::copy(data, data + width * height, mData);
         updateSum();
     }
 
@@ -77,115 +51,19 @@ public:
     }
 };
 
-class QRgbItemType {
-    friend class QImageArrayAdaptor;
-    friend class QImageRawArrayAdaptor;
-protected:
-    QRgb mRed;
-    QRgb mGreen;
-    QRgb mBlue;
-public:
-    inline QRgbItemType() : mRed(0), mGreen(0), mBlue(0) {}
-    inline QRgbItemType(QRgb red, QRgb green, QRgb blue):
-        mRed(red), mGreen(green), mBlue(blue) {}
-
-    inline QRgbItemType operator+(QRgbItemType other) {
-        return QRgbItemType(
-            mRed + other.mRed,
-            mGreen + other.mGreen,
-            mBlue + other.mBlue
-        );
-    }
-
-    template <typename T>
-    inline QRgbItemType operator/(T other) {
-        return QRgbItemType(
-            reinterpret_cast<QRgb>(mRed / other),
-            reinterpret_cast<QRgb>(mGreen / other),
-            reinterpret_cast<QRgb>(mBlue / other)
-        );
-    }
-
-    template <typename T>
-    inline QRgbItemType operator*(T other) {
-        return QRgbItemType(
-            reinterpret_cast<QRgb>(mRed * other),
-            reinterpret_cast<QRgb>(mGreen * other),
-            reinterpret_cast<QRgb>(mBlue * other)
-        );
-    }
-
-    inline QRgbItemType operator=(QRgbItemType other) {
-        mRed = other.mRed;
-        mGreen = other.mGreen;
-        mBlue = other.mBlue;
-        return *this;
-    }
-};
-
-class QImageArrayAdaptor {
-protected:
-    QImage &mImage;
-
-public:
-    typedef QRgbItemType ItemType;
-    QImageArrayAdaptor(QImage &image) : mImage(image) {}
-
-    inline size_t height() const {
-        return mImage.height();
-    }
-
-    inline size_t width() const {
-        return mImage.width();
-    }
-
-    inline ItemType get(size_t rowIndex, size_t columnIndex) {
-        QRgb rgb = mImage.pixel(columnIndex, rowIndex);
-        return ItemType(qRed(rgb), qGreen(rgb), qBlue(rgb));
-    }
-
-    inline void set(size_t rowIndex, size_t columnIndex, ItemType value) {
-        QRgb rgb = qRgb(value.mRed, value.mGreen, value.mBlue);
-        mImage.setPixel(columnIndex, rowIndex, rgb);
-    }
-};
-
-class QImageRawArrayAdaptor {
-protected:
-    QImage &mImage;
-    size_t mWidth;
-    size_t mHeight;
-    const uchar *mBits;
-    uchar *mOut;
-
-public:
-    typedef QRgbItemType ItemType;
-
-    QImageRawArrayAdaptor(QImage &image, uchar *out) :
-        mImage(image), mWidth(image.width()), mHeight(image.height()),
-        mBits(image.bits()), mOut(out) {}
-
-    inline size_t height() const {
-        return mHeight;
-    }
-
-    inline size_t width() const {
-        return mWidth;
-    }
-
-    inline ItemType get(size_t rowIndex, size_t columnIndex) {
-        const uchar *ptr = mBits + 3 * (rowIndex * mWidth + columnIndex);
-        QRgb rgb = qRgb(ptr[0], ptr[1], ptr[2]);
-        return ItemType(qRed(rgb), qGreen(rgb), qBlue(rgb));
-    }
-
-    inline void set(size_t rowIndex, size_t columnIndex, ItemType value) {
-        uchar *optr = mOut + 3 * (rowIndex * mWidth + columnIndex);
-        optr[0] = value.mRed;
-        optr[1] = value.mGreen;
-        optr[2] = value.mBlue;
-    }
-};
+/*
+ * Convolution2D must be instantiated with an instance of an Adaptor
+ * Adaptor must provide the following interface
+ * class Adaptor {
+ * public:
+ * typedef ... ItemType;
+ * ItemType get(size_t rowIndex, size_t columnIndex);
+ * void set(size_t rowIndex, size_t columnIndex, ItemType value);
+ * }
+ *
+ * ItemType must provide the addition, division, multiplication
+ * and assignment operators
+ */
 
 class Convolution2D
 {

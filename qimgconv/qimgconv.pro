@@ -12,5 +12,7 @@ QMAKE_CXXFLAGS += -std=c++0x
 # Input
 HEADERS += qimageconv.h \
     convolution2d.h \
-    TimeLog.h
+    TimeLog.h \
+    QImageArrayAdaptor.h \
+    QTableWidgetKernelHelper.h
 SOURCES += qimageconv.cpp

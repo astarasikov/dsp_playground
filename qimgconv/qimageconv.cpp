@@ -16,6 +16,9 @@
 
 #include "qimageconv.h"
 #include "convolution2d.h"
+#include "QImageArrayAdaptor.h"
+#include "QTableWidgetKernelHelper.h"
+
 #include "TimeLog.h"
 
 #include "../fft.hh"
@@ -217,7 +220,7 @@ void DspWidget :: convolve(void) {
 
     uchar *out = new uchar[outputImage->byteCount()];
 
-    Kernel<int> kernel(*(this->kernelTable));
+    Kernel<int> kernel = kernelFromQTableWidget(*(this->kernelTable));
     QImageRawArrayAdaptor adaptor(*outputImage, out);
     DirectConvolution2D<int, QImageRawArrayAdaptor>
             convolution(kernel, adaptor);
