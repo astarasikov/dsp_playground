@@ -41,13 +41,10 @@ DspWidget::DspWidget(QWidget *parent)
     QFrame *switches = new QFrame(this);
     createControls(switches);
     lay_controls->addWidget(switches);
-    lay_controls->addWidget(kernelTable);;
+    lay_controls->addWidget(kernelTable);
 
-    inputImageDisplay = new QLabel(this);
-    inputImageDisplay->setScaledContents(true);
-
-    outputImageDisplay = new QLabel(this);
-    outputImageDisplay->setScaledContents(true);
+    inputImageDisplay = new ImageLabel(this);
+    outputImageDisplay = new ImageLabel(this);
 
     QFrame *images = new QFrame(this);
     images->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
@@ -276,6 +273,17 @@ void DspWidget :: resetOutputImage(void) {
     refreshImages();
 }
 
+static void setLabelImage(QImage *image, ImageLabel *label) {
+    QPixmap in_pm;
+    in_pm.convertFromImage(*image);
+    label->setPixmap(in_pm);
+}
+
+void DspWidget :: refreshImages(void) {
+    setLabelImage(inputImage, inputImageDisplay);
+    setLabelImage(outputImage, outputImageDisplay);
+}
+
 void DspWidget :: loadImage(QString filename) {
     if (inputImage) {
         delete inputImage;
@@ -294,16 +302,6 @@ void DspWidget :: setKernelWidth(int columns) {
 void DspWidget :: setKernelHeight(int rows) {
     kernelTable->setRowCount(rows);
     fillKernel();
-}
-
-void DspWidget :: refreshImages(void) {
-    QPixmap in_pm;
-    in_pm.convertFromImage(*inputImage);
-    inputImageDisplay->setPixmap(in_pm);
-
-    QPixmap out_pm;
-    out_pm.convertFromImage(*outputImage);
-    outputImageDisplay->setPixmap(out_pm);
 }
 
 DspWindow :: DspWindow(QWidget *parent) {

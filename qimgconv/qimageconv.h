@@ -13,6 +13,8 @@
 #include <QTableWidget>
 #include <QSlider>
 
+#include "imagelabel.h"
+
 class DspWidget : public QWidget {
     Q_OBJECT
 public:
@@ -26,8 +28,8 @@ protected:
     QTableWidget *kernelTable;
     void createControls(QWidget *);
 
-    QLabel *inputImageDisplay;
-    QLabel *outputImageDisplay;
+    ImageLabel *inputImageDisplay;
+    ImageLabel *outputImageDisplay;
     QImage *inputImage;
     QImage *outputImage;
     uchar *outputBuffer;

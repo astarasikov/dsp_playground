@@ -13,5 +13,6 @@ QMAKE_CXXFLAGS += -std=c++0x
 HEADERS += qimageconv.h \
     TimeLog.h \
     QImageArrayAdaptor.h \
-    QTableWidgetKernelHelper.h
+    QTableWidgetKernelHelper.h \
+    imagelabel.h
 SOURCES += qimageconv.cpp
