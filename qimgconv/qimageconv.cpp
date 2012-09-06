@@ -215,15 +215,26 @@ void DspWidget :: convolve(void) {
         return;
     }
 
+    uchar *out = new uchar[outputImage->byteCount()];
+
     Kernel<int> kernel(*(this->kernelTable));
-    QImageArrayAdaptor adaptor(*outputImage);
-    DirectConvolution2D<int, QImageArrayAdaptor>
+    QImageRawArrayAdaptor adaptor(*outputImage, out);
+    DirectConvolution2D<int, QImageRawArrayAdaptor>
             convolution(kernel, adaptor);
 
     QString title("2D Convolution");
     DebugTimeLog log(title);
     convolution.convolve();
     log.stop();
+
+    QImage *newImage = new QImage(
+        out,
+        outputImage->width(),
+        outputImage->height(),
+        outputImage->format());
+
+    delete outputImage;
+    outputImage = newImage;
 
     refreshImages();
 }
@@ -284,7 +295,8 @@ void DspWidget :: loadImage(QString filename) {
     if (outputImage) {
         delete outputImage;
     }
-    inputImage = new QImage(filename);
+    QImage img(filename);
+    inputImage = new QImage(img.convertToFormat(QImage::Format_RGB888));
     outputImage = new QImage(*inputImage);
     refreshImages();
 }
