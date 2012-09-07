@@ -1,4 +1,5 @@
 #include <cstring>
+#include <cstdlib>
 #include <iostream>
 
 #include "../timelog.hh"
@@ -132,7 +133,7 @@ static void runTest(size_t SIZE, bool debug) {
 
 	if (debug) {
 		print2D(in, SIZE, SIZE);
-		print2D(in, SIZE, SIZE);
+		print2D(out, SIZE, SIZE);
 	}
 
 	delete[] in;

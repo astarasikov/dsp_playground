@@ -62,6 +62,7 @@ protected:
 	T *mData;
 	size_t mWidth;
 	size_t mHeight;
+	T *mDataOut;
 
 public:
 	typedef T ItemType;
@@ -69,8 +70,8 @@ public:
 		return 0;
 	}
 
-	SimpleArrayAdaptor(T* data, size_t width, size_t height)
-		: mData(data), mWidth(width), mHeight(height) {}
+	SimpleArrayAdaptor(T* data, size_t width, size_t height, T* out)
+		: mData(data), mWidth(width), mHeight(height), mDataOut(out) {}
 
 	inline size_t height() const {
 		return mHeight;
@@ -85,7 +86,7 @@ public:
 	}
 
 	inline void set(size_t rowIndex, size_t columnIndex, ItemType value) {
-		mData[rowIndex * mWidth + columnIndex] = value;
+		mDataOut[rowIndex * mWidth + columnIndex] = value;
 	}
 };
 

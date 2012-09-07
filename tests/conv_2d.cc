@@ -38,8 +38,8 @@ static void runTest(size_t SIZE, bool debug) {
 
 	Kernel<TestType> kernel(kernelData, KERNEL_SIZE, KERNEL_SIZE);
 
-	SimpleArrayAdaptor<TestType> adaptor(in, SIZE, SIZE);
-	DirectConvolution2D<TestType, SimpleArrayAdaptor<TestType>>
+	SimpleArrayAdaptor<TestType> adaptor(in, SIZE, SIZE, out);
+	DirectConvolution2D<TestType, SimpleArrayAdaptor<TestType> >
 		convolution(kernel, adaptor);
 	
 	std::string title = "2D convolution";
@@ -49,7 +49,7 @@ static void runTest(size_t SIZE, bool debug) {
 
 	if (debug) {
 		print2D(in, SIZE, SIZE);
-		print2D(in, SIZE, SIZE);
+		print2D(out, SIZE, SIZE);
 	}
 
 	delete[] in;
