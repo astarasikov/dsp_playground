@@ -1,6 +1,8 @@
 #ifndef CONVOLUTION2D_HH
 #define CONVOLUTION2D_HH
 
+#include <algorithm>
+
 /*
  * Note that most classes are implemented directly in this header
  * to allow inlining
@@ -50,11 +52,50 @@ public:
 };
 
 /*
+ * This is the default ArrayAdaptor implementation for POD types
+ *
+ */
+
+template<typename T>
+class SimpleArrayAdaptor {
+protected:
+	T *mData;
+	size_t mWidth;
+	size_t mHeight;
+
+public:
+	typedef T ItemType;
+	static const inline T Zero() {
+		return 0;
+	}
+
+	SimpleArrayAdaptor(T* data, size_t width, size_t height)
+		: mData(data), mWidth(width), mHeight(height) {}
+
+	inline size_t height() const {
+		return mHeight;
+	}
+
+	inline size_t width() const {
+		return mWidth;
+	}
+
+	inline ItemType get(size_t rowIndex, size_t columnIndex) {
+		return mData[rowIndex * mWidth + columnIndex];
+	}
+
+	inline void set(size_t rowIndex, size_t columnIndex, ItemType value) {
+		mData[rowIndex * mWidth + columnIndex] = value;
+	}
+};
+
+/*
  * Convolution2D must be instantiated with an instance of an Adaptor
  * Adaptor must provide the following interface
  * class Adaptor {
  * public:
  * typedef ... ItemType;
+ * ItemType Zero();
  * ItemType get(size_t rowIndex, size_t columnIndex);
  * void set(size_t rowIndex, size_t columnIndex, ItemType value);
  * }
@@ -95,7 +136,8 @@ public:
 
         for (size_t img_row = 0; img_row < height; img_row++) {
             for (size_t img_col = 0; img_col < width; img_col++) {
-                typename Adaptor::ItemType accumulator;
+                typename Adaptor::ItemType accumulator
+					= Adaptor::Zero();
 
                 for (size_t kern_row = 0; kern_row < kern_height; kern_row++)
                 {

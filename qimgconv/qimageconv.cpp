@@ -17,7 +17,7 @@
 #include "QImageArrayAdaptor.h"
 #include "QTableWidgetKernelHelper.h"
 
-#include "TimeLog.h"
+#include "../timelog.hh"
 
 #include <complex>
 #include "../fft.hh"
@@ -215,7 +215,7 @@ void DspWidget :: convolve(void) {
     DirectConvolution2D<int, QImageRawArrayAdaptor>
             convolution(kernel, adaptor);
 
-    QString title("2D Convolution");
+    std::string title("2D Convolution");
     DebugTimeLog log(title);
     convolution.convolve();
     log.stop();

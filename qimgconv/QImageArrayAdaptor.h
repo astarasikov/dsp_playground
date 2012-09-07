@@ -55,6 +55,10 @@ protected:
 
 public:
     typedef QRgbItemType ItemType;
+    static const inline QRgbItemType Zero() {
+        return QRgbItemType();
+    }
+
     QImageArrayAdaptor(QImage &image) : mImage(image) {}
 
     inline size_t height() const {
@@ -86,6 +90,9 @@ protected:
 
 public:
     typedef QRgbItemType ItemType;
+    static const inline QRgbItemType Zero() {
+        return QRgbItemType();
+    }
 
     QImageRawArrayAdaptor(QImage &image, uchar *out) :
         mImage(image), mWidth(image.width()), mHeight(image.height()),
