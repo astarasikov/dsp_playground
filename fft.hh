@@ -3,8 +3,11 @@
 
 #include <vector>
 #include <complex>
-#define _USE_MATH_DEFINES
 #include <math.h>
+
+#ifndef M_PI
+	#define M_PI (acos(-1.0))
+#endif
 
 #include "bit_hacks.hh"
 
