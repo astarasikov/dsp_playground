@@ -26,18 +26,18 @@ public:
     template <typename T>
     inline QRgbItemType operator/(T other) {
         return QRgbItemType(
-            reinterpret_cast<QRgb>(mRed / other),
-            reinterpret_cast<QRgb>(mGreen / other),
-            reinterpret_cast<QRgb>(mBlue / other)
+            static_cast<QRgb>(mRed / other),
+            static_cast<QRgb>(mGreen / other),
+            static_cast<QRgb>(mBlue / other)
         );
     }
 
     template <typename T>
     inline QRgbItemType operator*(T other) {
         return QRgbItemType(
-            reinterpret_cast<QRgb>(mRed * other),
-            reinterpret_cast<QRgb>(mGreen * other),
-            reinterpret_cast<QRgb>(mBlue * other)
+            static_cast<QRgb>(mRed * other),
+            static_cast<QRgb>(mGreen * other),
+            static_cast<QRgb>(mBlue * other)
         );
     }
 
