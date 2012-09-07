@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
 	count = atoi(argv[1]);
 	std::cout << count << std::endl;
 
-	if (argc >= 4 && !strcmp(argv[2], "-debug")) {
+	if (argc >= 3 && !strcmp(argv[2], "-debug")) {
 		debug = true;
 	}
 

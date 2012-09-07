@@ -1,4 +1,4 @@
-TESTS=conv_2d
+TESTS=conv_2d conv_raw
 CXX ?= g++
 #CXFLAGS=-std=c++0x -Wall -pg
 CXFLAGS=-O3 -std=c++0x -Wall
