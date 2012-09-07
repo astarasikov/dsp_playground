@@ -1,18 +1,13 @@
-TESTS=conv_2d conv_raw
+TESTS=conv_2d conv_2d_par conv_raw
 CXX ?= g++
-#CXFLAGS=-std=c++0x -Wall -pg
-CXFLAGS=-O3 -std=c++0x -Wall
+CXFLAGS=-O3 -fopenmp -Wall
 
-CXFILES = $(patsubst %,%.cc,$(TESTS))
-OBJFILES = $(patsubst %.cc,%.o,$(CXFILES))
+CXFILES = ${TESTS:=.cc}
 
-all: $(TESTS)
+all: ${TESTS}
 
-$(TESTS): $(OBJFILES)
-	$(CXX) $(CXFLAGS) -o $@ $<
-
-$(OBJFILES): %.o: %.cc
-	$(CXX) $(CXFLAGS) -c $< -o $@
+${TESTS}: ${CXFILES}
+	$(CXX) $(CXFLAGS) -o $@ $@.cc
 
 clean:
 	rm -f $(TESTS)
