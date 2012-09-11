@@ -9,8 +9,6 @@ protected:
     QTextEdit &mTextEdit;
     qint64 mTimeStart;
 
-    const unsigned maxLines = 100;
-
 public:
     Logger(QTextEdit &textEdit) :
         mTextEdit(textEdit),
