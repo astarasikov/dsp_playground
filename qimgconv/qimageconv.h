@@ -12,6 +12,7 @@
 #include <QLabel>
 #include <QTableWidget>
 #include <QSlider>
+#include <QTextEdit>
 
 #include "imagelabel.h"
 
@@ -33,6 +34,8 @@ protected:
     QImage *inputImage;
     QImage *outputImage;
     uchar *outputBuffer;
+
+    QTextEdit *logTextEdit;
 protected slots:
     void setKernelWidth(int);
     void setKernelHeight(int);

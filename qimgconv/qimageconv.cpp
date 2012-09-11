@@ -17,7 +17,7 @@
 #include "QImageArrayAdaptor.h"
 #include "QTableWidgetKernelHelper.h"
 
-#include "../timelog.hh"
+#include "logger.h"
 
 #include <complex>
 #include "../fft.hh"
@@ -25,6 +25,10 @@
 DspWidget::DspWidget(QWidget *parent)
     : inputImage(NULL), outputImage(NULL), outputBuffer(NULL) {
     Q_UNUSED(parent);
+
+    logTextEdit = new QTextEdit(this);
+    logTextEdit->setSizePolicy(QSizePolicy::MinimumExpanding,
+                               QSizePolicy::Minimum);
 
     QFrame *controls = new QFrame(this);
     controls->setSizePolicy(QSizePolicy::MinimumExpanding,
@@ -41,7 +45,13 @@ DspWidget::DspWidget(QWidget *parent)
     QFrame *switches = new QFrame(this);
     createControls(switches);
     lay_controls->addWidget(switches);
-    lay_controls->addWidget(kernelTable);
+
+    QFrame *logAndKernel = new QFrame(this);
+    QVBoxLayout *vboxLogAndKernel = new QVBoxLayout(logAndKernel);
+    vboxLogAndKernel->addWidget(kernelTable);
+    vboxLogAndKernel->addWidget(logTextEdit);
+
+    lay_controls->addWidget(logAndKernel);
 
     inputImageDisplay = new ImageLabel(this);
     outputImageDisplay = new ImageLabel(this);
@@ -216,9 +226,11 @@ void DspWidget :: convolve(void) {
             convolution(kernel, adaptor);
 
     std::string title("2D Convolution");
-    DebugTimeLog log(title);
+
+    Logger log(*logTextEdit);
+    log.message("started convolution");
     convolution.convolve();
-    log.stop();
+    log.message("stopped convolution");
 
     QImage *newImage = new QImage(
         outputBuffer,

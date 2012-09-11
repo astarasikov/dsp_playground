@@ -9,9 +9,17 @@ INCLUDEPATH += .
 
 QMAKE_CXXFLAGS += -std=c++0x -U__STRICT_ANSI__
 
+CONFIG += static
+
+static {
+	DEFINES += STATIC
+	message("static build.")
+}
+
 # Input
 HEADERS += qimageconv.h \
     QImageArrayAdaptor.h \
     QTableWidgetKernelHelper.h \
-    imagelabel.h
+    imagelabel.h \
+    logger.h
 SOURCES += qimageconv.cpp
