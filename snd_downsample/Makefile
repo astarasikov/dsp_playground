@@ -1,9 +1,9 @@
-APPNAME=biquad_filter
+APPNAME=snd_downsample
 CC ?= gcc
-CFLAGS=-std=c99 -Wall -Werror -Wextra -pg $(shell pkg-config --cflags sndfile)
+CFLAGS=-std=c99 -Wall -Wextra -Werror -pg $(shell pkg-config --cflags sndfile)
 LDFLAGS=$(shell pkg-config --libs sndfile)
 
-CFILES = biquad_sndfile.c
+CFILES = $(APPNAME).c
 OBJFILES = $(patsubst %.c,%.o,$(CFILES))
 
 all: $(APPNAME)

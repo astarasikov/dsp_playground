@@ -11,8 +11,8 @@
 
 #include "bit_hacks.hh"
 
-template <class T>
-void fft(std::complex<T> *arr, size_t size, bool inverse) {
+template <class T, size_t size, bool inverse>
+inline void fft(std::complex<T> *arr) {
 	size_t pwr = next_power_of_two(size);
 
 	if (size <= 1) {
@@ -54,14 +54,14 @@ void fft(std::complex<T> *arr, size_t size, bool inverse) {
 	}
 }
 
-template <class T>
-void fft_skip(std::complex<T> data[], size_t stride, size_t count, bool inverse) {
+template <class T, size_t stride, size_t count, bool inverse>
+inline void fft_skip(std::complex<T> data[]) {
 	auto vec = new std::complex<T>[count];
 
 	for (size_t i = 0; i < count; i++) {
 		vec[i] = data[stride * i];
 	}
-	fft(vec, count, inverse);
+	fft<T, count, inverse>(vec);
 	for (size_t i = 0; i < count; i++) {
 		data[stride * i] = vec[i];
 	}
@@ -69,15 +69,15 @@ void fft_skip(std::complex<T> data[], size_t stride, size_t count, bool inverse)
 	delete[] vec;
 }
 
-template<class T>
-void fft_2d(std::complex<T> *data, size_t width, size_t height, bool inverse) {
+template<class T, size_t width, size_t height, bool inverse>
+inline void fft_2d(std::complex<T> *data) {
 	for (size_t i = 0; i < width; i++) {
 		//vertical direction
-		fft_skip(data + i, width, height, inverse);
+		fft_skip<T, width, height, inverse>(data + i);
 	}
 	for (size_t i = 0; i < height; i++) {
 		//horizontal direction
-		fft_skip(data + width * i, 1, width, inverse);
+		fft_skip<T, 1, width, inverse>(data + width * i);
 	}
 }
 

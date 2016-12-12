@@ -1,8 +1,9 @@
 APPNAME=convolution
 CXX ?= g++
-CXFLAGS=-std=c++0x -Wall -pg
+CXFLAGS=-std=c++0x -Wall -O3
 
-CXFILES = main.cc
+#CXFILES = main.cc
+CXFILES = bmp-fft.cc
 OBJFILES = $(patsubst %.cc,%.o,$(CXFILES))
 
 all: $(APPNAME)
